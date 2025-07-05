@@ -2,11 +2,22 @@
 import React from "react";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
+import axios from "axios";
 
 const LoginForm = () => {
-  const handleSubmit = (e: { preventDefault: () => void }) => {
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     // Handle login logic here
+    const submit = await axios.post(
+      `${process.env.BACKEND_URL}/api/v1/auth/login`,
+      {
+        email,
+        password,
+      }
+    );
   };
 
   return (
@@ -15,7 +26,12 @@ const LoginForm = () => {
         {/* <label htmlFor="email" className="text-sm font-medium">
           Email
         </label> */}
-        <Input label="Email" type="email" />
+        <Input
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
         {/* <Input
           type="email"
           id="email"
@@ -28,7 +44,12 @@ const LoginForm = () => {
         /> */}
       </div>
       <div className="flex flex-col gap-1">
-        <Input label="Password" type="password" />
+        <Input
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
         {/* <label htmlFor="password" className="text-sm font-medium">
           Password
         </label>

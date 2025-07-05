@@ -10,7 +10,12 @@ dotenv.config();
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const response = await axios.get(`${process.env.BACKEND_URL}/api/v1/dashboard/data`);
+  const response = await axios.get(
+    `${process.env.BACKEND_URL}/api/v1/dashboard/data`,
+    {
+      withCredentials: true,
+    }
+  );
   if (response.status !== 200) {
     throw new Error("Failed to fetch dashboard data");
   }
