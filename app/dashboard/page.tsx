@@ -7,6 +7,8 @@ import dotenv from "dotenv";
 import axios from "axios";
 dotenv.config();
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const response = await axios.get(`${process.env.BACKEND_URL}/api/v1/dashboard/data`);
   if (response.status !== 200) {
