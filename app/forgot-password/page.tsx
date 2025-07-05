@@ -18,7 +18,6 @@ const ForgotPasswordPage = () => {
       <ForgotPasswordForm
         email={email}
         setEmail={setEmail}
-        onSubmit={handleSubmit}
       />
     </div>
   );

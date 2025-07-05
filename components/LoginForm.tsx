@@ -1,19 +1,16 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 
 const LoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
   const handleSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
     // Handle login logic here
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5 w-full px-4">
+    <form className="flex flex-col gap-5 w-full px-4" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-1">
         {/* <label htmlFor="email" className="text-sm font-medium">
           Email
@@ -46,7 +43,7 @@ const LoginForm = () => {
           className="w-full"
         /> */}
       </div>
-      <Button type="submit" className="mt-2 w-full" variant="solid" size="lg">
+      <Button className="mt-2 w-full" size="lg" type="submit" variant="solid">
         Login
       </Button>
     </form>

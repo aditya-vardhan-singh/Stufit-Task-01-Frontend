@@ -3,13 +3,11 @@ import React, { useState } from "react";
 interface ForgotPasswordFormProps {
   email: string;
   setEmail: React.Dispatch<React.SetStateAction<string>>;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
 export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
   email,
   setEmail,
-  onSubmit,
 }) => {
   const [message, setMessage] = useState("");
 
