@@ -1,3 +1,6 @@
+"use client";
+
+import React, { useEffect } from "react";
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -17,8 +20,31 @@ import clsx from "clsx";
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { SearchIcon } from "@/components/icons";
+import { useAuthStore } from "@/store/auth";
 
 export const Navbar = () => {
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const setLoggedIn = useAuthStore((state) => state.setLoggedIn);
+
+  useEffect(() => {
+    // Sync Zustand state with localStorage on mount
+    setLoggedIn(!!localStorage.getItem("isLoggedIn"));
+    // Listen for login/logout events from other tabs
+    const handler = () => setLoggedIn(!!localStorage.getItem("isLoggedIn"));
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
+  }, [setLoggedIn]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    setLoggedIn(false);
+    // Remove token cookie with various path and domain options
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + window.location.hostname + ";";
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.stufit-task-01-backend.onrender.com;";
+    window.location.href = "/login";
+  };
+
   const searchInput = (
     <Input
       aria-label="Search"
@@ -73,18 +99,30 @@ export const Navbar = () => {
       >
         <NavbarItem className="hidden sm:flex gap-2">
           <ThemeSwitch />
-          <Link
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
-            href="/login"
-          >
-            Login
-          </Link>
-          <Link
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-default-300 bg-white px-4 py-2 text-sm font-semibold text-primary-600 shadow-sm hover:bg-default-100"
-            href="/signup"
-          >
-            Signup
-          </Link>
+          {!isLoggedIn && (
+            <Link
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+              href="/login"
+            >
+              Login
+            </Link>
+          )}
+          {isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700"
+              style={{ border: "none" }}
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-default-300 bg-white px-4 py-2 text-sm font-semibold text-primary-600 shadow-sm hover:bg-default-100"
+              href="/signup"
+            >
+              Signup
+            </Link>
+          )}
         </NavbarItem>
         {/* <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem> */}
         {/* <NavbarItem className="hidden md:flex">
@@ -155,5 +193,7 @@ export const Navbar = () => {
 // index === 2
 //   ? "primary"
 //   : index === siteConfig.navMenuItems.length - 1
+//     ? "danger"
+//     : "foreground"
 //     ? "danger"
 //     : "foreground"

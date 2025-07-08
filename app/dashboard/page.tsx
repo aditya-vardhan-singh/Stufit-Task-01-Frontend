@@ -6,6 +6,7 @@ import Scheduler from "@/components/dashboard/Scheduler";
 import dotenv from "dotenv";
 import axios from "axios";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 dotenv.config();
 
 export const dynamic = "force-dynamic";
@@ -15,24 +16,23 @@ export default async function DashboardPage() {
   const cookieStore = cookies();
   const token = (await cookieStore).get("token")?.value;
 
-  // if (!token) {
-  //   // Redirect to login if token is missing
-  //   return (
-  //     // You can use Next.js redirect helper (recommended for app directory)
-  //     // or a simple <Redirect /> component if using client-side routing
-  //     // Here is the server-side redirect:
-  //     // @ts-expect-error Server Component
-  //     redirect("/login")
-  //   );
-  // }
+  if (!token) {
+    // Redirect to login if token is missing
+
+    // You can use Next.js redirect helper (recommended for app directory)
+    // or a simple <Redirect /> component if using client-side routing
+    // Here is the server-side redirect:
+    //// @ts-expect-error Server Component
+    redirect("/login");
+  }
 
   const response = await axios.get(
     `${process.env.BACKEND_URL}/api/v1/dashboard/data`,
     {
-      // withCredentials: true,
-      // headers: {
-      //   Cookie: `token=${token}`,
-      // },
+      withCredentials: true,
+      headers: {
+        Cookie: `token=${token}`,
+      },
     }
   );
   if (response.status !== 200) {
