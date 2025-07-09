@@ -20,11 +20,20 @@ import clsx from "clsx";
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { SearchIcon } from "@/components/icons";
-import { useAuthStore } from "@/store/auth";
+import { useAuthStore } from "@/store/authStore";
 
 export const Navbar = () => {
+  const checkAuth = useAuthStore((state) => state.checkAuth);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const setLoggedIn = useAuthStore((state) => state.setLoggedIn);
+  const logout = useAuthStore((state) => state.logout);
+
+  useEffect(() => {
+    const verify = async () => {
+      await checkAuth();
+    };
+    verify();
+  }, []);
 
   useEffect(() => {
     // Sync Zustand state with localStorage on mount
@@ -36,12 +45,7 @@ export const Navbar = () => {
   }, [setLoggedIn]);
 
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    setLoggedIn(false);
-    // Remove token cookie with various path and domain options
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + window.location.hostname + ";";
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.stufit-task-01-backend.onrender.com;";
+    logout();
     window.location.href = "/login";
   };
 
@@ -81,7 +85,7 @@ export const Navbar = () => {
               <NextLink
                 className={clsx(
                   linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
+                  "data-[active=true]:text-primary data-[active=true]:font-medium"
                 )}
                 color="foreground"
                 href={item.href}

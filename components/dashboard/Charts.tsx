@@ -116,7 +116,7 @@ export default function Charts({ categories }: { categories: any[] }) {
         display: true,
         position: "bottom" as const,
         labels: {
-          color: "#222",
+          color: "#6b7280",
           font: { weight: "bold", size: 13 },
           padding: 18,
           boxWidth: 18,
@@ -183,7 +183,7 @@ export default function Charts({ categories }: { categories: any[] }) {
               className={`px-4 py-1 rounded-full text-xs font-medium transition ${
                 idx === selectedIdx
                   ? "bg-blue-600 text-white shadow"
-                  : "bg-gray-200 text-gray-800 hover:bg-blue-100"
+                  : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-blue-100"
               }`}
               onClick={() => setSelectedIdx(idx)}
             >
@@ -202,7 +202,7 @@ export default function Charts({ categories }: { categories: any[] }) {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             {selectedCategory ? selectedCategory.name : "Category"} - Disease Types
           </h2>
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+          <span className="text-xs text-gray-500 dark:text-white">
             Total: {totalCategory}
           </span>
         </div>

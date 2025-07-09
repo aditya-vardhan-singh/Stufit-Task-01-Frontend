@@ -1,48 +1,35 @@
-import React from "react";
-import SummaryCards from "@/components/dashboard/SummaryCards";
-import Filters from "@/components/dashboard/Filters";
-import Charts from "@/components/dashboard/Charts";
-import Scheduler from "@/components/dashboard/Scheduler";
-import dotenv from "dotenv";
-import axios from "axios";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-dotenv.config();
+"use client";
 
-export const dynamic = "force-dynamic";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import { Dashboard } from "@/components/dashboard/Dashboard";
 
-export default async function DashboardPage() {
-  // Check for token cookie on the server
-  const cookieStore = cookies();
-  const token = (await cookieStore).get("token")?.value;
+export default function DashboardPage() {
+  const checkAuth = useAuthStore((state) => state.checkAuth);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-  if (!token) {
-    // Redirect to login if token is missing
+  useEffect(() => {
+    const verify = async () => {
+      setLoading(true);
+      // if (!isLoggedIn) {
+      //   router.replace("/login");
+      // } else {
+      //   setLoading(false);
+      // }
+      const ok = await checkAuth();
+      if (!ok) {
+        router.replace("/login");
+      } else {
+        setLoading(false);
+      }
+    };
+    verify();
+  }, []);
 
-    // You can use Next.js redirect helper (recommended for app directory)
-    // or a simple <Redirect /> component if using client-side routing
-    // Here is the server-side redirect:
-    //// @ts-expect-error Server Component
-    redirect("/login");
-  }
-
-  const response = await axios.get(
-    `${process.env.BACKEND_URL}/api/v1/dashboard/data`,
-    {
-      withCredentials: true,
-      headers: {
-        Cookie: `token=${token}`,
-      },
-    }
-  );
-  if (response.status !== 200) {
-    throw new Error("Failed to fetch dashboard data");
-  }
-  const data = response.data;
-  const categories = data.categories;
-  const schools = data.schools;
-  const sessions = data.sessions;
-  const years = data.years;
+  if (loading) return null; // or a spinner if needed
 
   return (
     <main className="min-h-screen flex flex-col items-center py-10 px-2 pb-24">
@@ -51,10 +38,7 @@ export default async function DashboardPage() {
           Health Dashboard
         </h1>
       </div>
-      <Filters schools={schools} sessions={sessions} years={years} />
-      <SummaryCards categories={categories} />
-      <Charts categories={categories} />
-      <Scheduler schools={schools} />
+      <Dashboard />
     </main>
   );
 }
