@@ -7,12 +7,40 @@ import Charts from "@/components/dashboard/Charts";
 import Scheduler from "@/components/dashboard/Scheduler";
 import { useDashboardStore } from "@/store/dashboardStore";
 
+interface School {
+  id: string;
+  name: string;
+}
+
+interface Session {
+  id: string;
+  name: string;
+}
+
+
 export const Dashboard = () => {
   const getDashboard = useDashboardStore((state) => state.getData);
   const [categories, setCategories] = useState([]);
-  const [schools, setSchools] = useState([]);
-  const [sessions, setSessions] = useState([]);
+  const [schools, setSchools] = useState<School[]>([]);
+  const [sessions, setSessions] = useState<Session[]>([]);
   const [years, setYears] = useState([]);
+
+  // Filters
+  const [session, setSession] = useState(sessions[0]?.id || "");
+  const [year, setYear] = useState(String(years[0] || ""));
+  const [school, setSchool] = useState<string>(schools[0]?.id || "");
+
+  const applyFilters = async () => {
+    // call axios to get filtered data
+    return;
+  };
+
+  const resetFilters = () => {
+    setSchool("");
+    setSession("");
+    setYear("");
+    console.log("Filters reset successfully");
+  };
 
   const handleSubmit = async () => {
     const response = await getDashboard();
@@ -32,7 +60,18 @@ export const Dashboard = () => {
 
   return (
     <>
-      <Filters schools={schools} sessions={sessions} years={years} />
+      <Filters
+        schools={schools}
+        school={school}
+        setSchool={setSchool}
+        sessions={sessions}
+        session={session}
+        setSession={setSession}
+        years={years}
+        year={year}
+        setYear={setYear}
+        resetFilters={resetFilters}
+      />
       <SummaryCards categories={categories} />
       <Charts categories={categories} />
       <Scheduler schools={schools} />

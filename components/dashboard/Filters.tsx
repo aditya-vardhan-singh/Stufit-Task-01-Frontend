@@ -2,83 +2,109 @@
 import React, { useState } from "react";
 import { Select, SelectSection, SelectItem } from "@heroui/select";
 import { DateRangePicker } from "@heroui/date-picker";
+import { Button } from "@heroui/button";
 
 export default function Filters({
   schools,
+  school,
+  setSchool,
   sessions,
+  session,
+  setSession,
   years,
+  year,
+  setYear,
+  resetFilters,
 }: {
   schools: { id: string; name: string }[];
+  school:string;
+  setSchool: React.Dispatch<any>;
   sessions: { id: string; name: string }[];
+  session: string;
+  setSession: React.Dispatch<any>;
   years: number[];
+  year: string;
+  setYear: React.Dispatch<any>;
+  resetFilters: () => void;
 }) {
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
-  const [session, setSession] = useState(sessions[0]?.id || "");
-  const [year, setYear] = useState(String(years[0] || ""));
-  const [school, setSchool] = useState<string>(schools[0]?.id || "");
 
   return (
-    <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      <div className="flex flex-col">
-        <DateRangePicker
-          showMonthAndYearPickers={true}
-          className="max-w-xs"
-          label="Stay duration"
-          variant="bordered"
-        />
+    <div className="w-full max-w-6xl mb-8">
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div className="flex flex-col items-center">
+          <DateRangePicker
+            showMonthAndYearPickers={true}
+            className=""
+            label="Stay duration"
+            variant="bordered"
+          />
+        </div>
+        <div className="flex flex-col items-center">
+          <Select
+            className=""
+            label="Session"
+            placeholder="Select a session"
+            variant="bordered"
+            selectedKeys={new Set([session])}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0]; // assuming single selection
+              setSession(String(selected));
+            }}
+          >
+            {sessions.map((session) => (
+              <SelectItem key={session.id}>{session.name}</SelectItem>
+            ))}
+          </Select>
+        </div>
+        <div className="flex flex-col items-center">
+          <Select
+            className=""
+            label="Year"
+            placeholder="Select an year"
+            variant="bordered"
+            selectedKeys={new Set([year])}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0];
+              setYear(String(selected));
+            }}
+          >
+            {years.map((year) => (
+              <SelectItem key={year.toString()} textValue={year.toString()}>
+                {year}
+              </SelectItem>
+            ))}
+          </Select>
+        </div>
+        <div className="flex flex-col items-center">
+          <Select
+            className=""
+            label="School"
+            placeholder="Select a school"
+            variant="bordered"
+            selectedKeys={new Set([school])}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0]; // assuming single selection
+              setSchool(String(selected));
+            }}
+          >
+            {schools.map((school) => (
+              <SelectItem key={school.id}>{school.name}</SelectItem>
+            ))}
+          </Select>
+        </div>
       </div>
-      <div className="flex flex-col">
-        <Select
-          className="max-w-xs"
-          label="Session"
-          placeholder="Select a session"
-          variant="bordered"
-          selectedKeys={new Set([session])}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0]; // assuming single selection
-            setSession(String(selected));
-          }}
-        >
-          {sessions.map((session) => (
-            <SelectItem key={session.id}>{session.name}</SelectItem>
-          ))}
-        </Select>
-      </div>
-      <div className="flex flex-col">
-        <Select
-          className="max-w-xs"
-          label="Year"
-          placeholder="Select an year"
-          variant="bordered"
-          selectedKeys={new Set([year])}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
-            setYear(String(selected));
-          }}
-        >
-          {years.map((year) => (
-            <SelectItem key={year.toString()} textValue={year.toString()}>
-              {year}
-            </SelectItem>
-          ))}
-        </Select>
-      </div>
-      <div className="flex flex-col">
-        <Select
-          className="max-w-xs"
-          label="School"
-          placeholder="Select a school"
-          variant="bordered"
-          selectedKeys={new Set([school])}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0]; // assuming single selection
-            setSchool(String(selected));
-          }}
-        >
-          {schools.map((school) => (
-            <SelectItem key={school.id}>{school.name}</SelectItem>
-          ))}
-        </Select>
+      <div className="grid grid-cols-4 gap-4">
+        <div className="col-span-2 md:col-start-1">
+          <Button color="primary" variant="flat" className="w-full">
+            Apply
+          </Button>
+        </div>
+        <div className="col-span-2">
+          <Button color="danger" variant="flat" className="w-full" onPress={resetFilters}>
+            Reset
+          </Button>
+        </div>
       </div>
     </div>
   );
