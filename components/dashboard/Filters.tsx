@@ -47,9 +47,9 @@ export default function Filters({
         <div className="flex flex-col items-center">
           <DateRangePicker
             showMonthAndYearPickers={true}
-            label="Stay duration"
+            label="Date Range"
             variant="bordered"
-            value={dateRange ?? undefined}
+            value={dateRange}
             onChange={setDateRange}
           />
         </div>
