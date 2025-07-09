@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -28,6 +28,8 @@ export const Navbar = () => {
   const setLoggedIn = useAuthStore((state) => state.setLoggedIn);
   const logout = useAuthStore((state) => state.logout);
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   useEffect(() => {
     const verify = async () => {
       await checkAuth();
@@ -36,9 +38,7 @@ export const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    // Sync Zustand state with localStorage on mount
     setLoggedIn(!!localStorage.getItem("isLoggedIn"));
-    // Listen for login/logout events from other tabs
     const handler = () => setLoggedIn(!!localStorage.getItem("isLoggedIn"));
     window.addEventListener("storage", handler);
     return () => window.removeEventListener("storage", handler);
@@ -46,36 +46,21 @@ export const Navbar = () => {
 
   const handleLogout = () => {
     logout();
+    setIsMenuOpen(false);
     window.location.href = "/login";
   };
 
-  const searchInput = (
-    <Input
-      aria-label="Search"
-      classNames={{
-        inputWrapper: "bg-default-100",
-        input: "text-sm",
-      }}
-      endContent={
-        <Kbd className="hidden lg:inline-block" keys={["command"]}>
-          K
-        </Kbd>
-      }
-      labelPlacement="outside"
-      placeholder="Search..."
-      startContent={
-        <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
-      }
-      type="search"
-    />
-  );
-
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky">
+    <HeroUINavbar
+      maxWidth="xl"
+      position="sticky"
+      isMenuOpen={isMenuOpen}
+      onMenuOpenChange={setIsMenuOpen}
+    >
+      {/* Brand & Desktop Nav */}
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
-            {/* <Logo /> */}
             <p className="font-bold text-inherit">Stufit</p>
           </NextLink>
         </NavbarBrand>
@@ -87,7 +72,6 @@ export const Navbar = () => {
                   linkStyles({ color: "foreground" }),
                   "data-[active=true]:text-primary data-[active=true]:font-medium"
                 )}
-                color="foreground"
                 href={item.href}
               >
                 {item.label}
@@ -97,21 +81,29 @@ export const Navbar = () => {
         </ul>
       </NavbarContent>
 
+      {/* Desktop Auth Buttons */}
       <NavbarContent
         className="hidden sm:flex basis-1/5 sm:basis-full"
         justify="end"
       >
         <NavbarItem className="hidden sm:flex gap-2">
           <ThemeSwitch />
-          {!isLoggedIn && (
-            <Link
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
-              href="/login"
-            >
-              Login
-            </Link>
-          )}
-          {isLoggedIn ? (
+          {!isLoggedIn ? (
+            <>
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700"
+              >
+                Login
+              </Link>
+              <Link
+                href="/signup"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-default-300 bg-white px-4 py-2 text-sm font-semibold text-primary-600 shadow-sm hover:bg-default-100"
+              >
+                Signup
+              </Link>
+            </>
+          ) : (
             <button
               onClick={handleLogout}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700"
@@ -119,85 +111,67 @@ export const Navbar = () => {
             >
               Logout
             </button>
-          ) : (
-            <Link
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-default-300 bg-white px-4 py-2 text-sm font-semibold text-primary-600 shadow-sm hover:bg-default-100"
-              href="/signup"
-            >
-              Signup
-            </Link>
           )}
         </NavbarItem>
-        {/* <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem> */}
-        {/* <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href={siteConfig.links.sponsor}
-            startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
-          >
-            Sponsor
-          </Button>
-        </NavbarItem> */}
       </NavbarContent>
 
+      {/* Mobile Menu Toggle */}
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-        {/* <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-          <GithubIcon className="text-default-500" />
-        </Link> */}
         <ThemeSwitch />
         <NavbarMenuToggle />
       </NavbarContent>
 
+      {/* Mobile Menu Items */}
       <NavbarMenu>
-        {searchInput}
         <div className="mx-4 mt-2 flex flex-col gap-2">
           {siteConfig.navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>
-              <Link color={"foreground"} href={item.href} size="lg">
+              <Link
+                href={item.href}
+                color="foreground"
+                size="lg"
+                onClick={() => setIsMenuOpen(false)} // ✅ Auto-close on click
+              >
                 {item.label}
               </Link>
             </NavbarMenuItem>
           ))}
+
+          {!isLoggedIn ? (
+            <>
+              <NavbarMenuItem>
+                <Link
+                  href="/login"
+                  className="text-primary"
+                  size="lg"
+                  onClick={() => setIsMenuOpen(false)} // ✅ Auto-close
+                >
+                  Login
+                </Link>
+              </NavbarMenuItem>
+              <NavbarMenuItem>
+                <Link
+                  href="/signup"
+                  className="text-primary"
+                  size="lg"
+                  onClick={() => setIsMenuOpen(false)} // ✅ Auto-close
+                >
+                  Signup
+                </Link>
+              </NavbarMenuItem>
+            </>
+          ) : (
+            <NavbarMenuItem>
+              <button
+                onClick={handleLogout} // ✅ Auto-close in `handleLogout`
+                className="text-danger text-left w-full text-lg"
+              >
+                Logout
+              </button>
+            </NavbarMenuItem>
+          )}
         </div>
       </NavbarMenu>
     </HeroUINavbar>
   );
 };
-
-// index === 2
-//   ? "primary"
-//   : index === siteConfig.navMenuItems.length - 1
-//     ? "danger"
-//     : "foreground"
-//           <GithubIcon className="text-default-500" />
-//         </Link> */}
-//         <ThemeSwitch />
-//         <NavbarMenuToggle />
-//       </NavbarContent>
-
-//       <NavbarMenu>
-//         {searchInput}
-//         <div className="mx-4 mt-2 flex flex-col gap-2">
-//           {siteConfig.navMenuItems.map((item, index) => (
-//             <NavbarMenuItem key={`${item}-${index}`}>
-//               <Link color={"foreground"} href="#" size="lg">
-//                 {item.label}
-//               </Link>
-//             </NavbarMenuItem>
-//           ))}
-//         </div>
-//       </NavbarMenu>
-//     </HeroUINavbar>
-//   );
-// };
-
-// index === 2
-//   ? "primary"
-//   : index === siteConfig.navMenuItems.length - 1
-//     ? "danger"
-//     : "foreground"
-//     ? "danger"
-//     : "foreground"

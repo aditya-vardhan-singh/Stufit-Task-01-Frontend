@@ -34,14 +34,14 @@ export const siteConfig = {
       label: "Dashboard",
       href: "/dashboard",
     },
-    {
-      label: "Login",
-      href: "/login",
-    },
-    {
-      label: "Signup",
-      href: "/signup",
-    },
+    // {
+    //   label: "Login",
+    //   href: "/login",
+    // },
+    // {
+    //   label: "Signup",
+    //   href: "/signup",
+    // },
     // {
     //   label: "Projects",
     //   href: "/projects",

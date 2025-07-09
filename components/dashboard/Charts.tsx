@@ -72,7 +72,7 @@ export default function Charts({ categories }: { categories: any[] }) {
     },
     scales: {
       x: {
-        ticks: { color: "#222", font: { weight: "bold", size: 14 } },
+        ticks: { color: "#6b7280", font: { weight: "bold", size: 14 } },
         grid: { color: "#e5e7eb" },
       },
       y: {
@@ -196,9 +196,9 @@ export default function Charts({ categories }: { categories: any[] }) {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.2 }}
-        className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 flex flex-col"
+        className="col-span-2 md:col-span-1 bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 flex flex-col"
       >
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-2 w-full">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             {selectedCategory ? selectedCategory.name : "Category"} - Disease Types
           </h2>
