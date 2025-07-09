@@ -1,8 +1,14 @@
 "use client";
-import React, { useState } from "react";
-import { Select, SelectSection, SelectItem } from "@heroui/select";
+import React from "react";
+import { Select, SelectItem } from "@heroui/select";
 import { DateRangePicker } from "@heroui/date-picker";
 import { Button } from "@heroui/button";
+import { CalendarDate } from "@internationalized/date";
+
+type RangeValue<T> = {
+  start: T;
+  end: T;
+};
 
 export default function Filters({
   schools,
@@ -15,29 +21,36 @@ export default function Filters({
   year,
   setYear,
   resetFilters,
+  applyFilters,
+  dateRange,
+  setDateRange,
 }: {
   schools: { id: string; name: string }[];
-  school:string;
+  school: string;
   setSchool: React.Dispatch<any>;
-  sessions: { id: string; name: string }[];
+  sessions: { id: string; sessionName: string }[];
   session: string;
   setSession: React.Dispatch<any>;
   years: number[];
   year: string;
   setYear: React.Dispatch<any>;
   resetFilters: () => void;
+  applyFilters: () => void;
+  dateRange: RangeValue<CalendarDate> | null | undefined;
+  setDateRange: React.Dispatch<
+    React.SetStateAction<RangeValue<CalendarDate> | null | undefined>
+  >;
 }) {
-  const [dateRange, setDateRange] = useState({ from: "", to: "" });
-
   return (
     <div className="w-full max-w-6xl mb-8">
       <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div className="flex flex-col items-center">
           <DateRangePicker
             showMonthAndYearPickers={true}
-            className=""
             label="Stay duration"
             variant="bordered"
+            value={dateRange ?? undefined}
+            onChange={setDateRange}
           />
         </div>
         <div className="flex flex-col items-center">
@@ -53,7 +66,7 @@ export default function Filters({
             }}
           >
             {sessions.map((session) => (
-              <SelectItem key={session.id}>{session.name}</SelectItem>
+              <SelectItem key={session.id}>{session.sessionName}</SelectItem>
             ))}
           </Select>
         </div>
@@ -96,12 +109,22 @@ export default function Filters({
       </div>
       <div className="grid grid-cols-4 gap-4">
         <div className="col-span-2 md:col-start-1">
-          <Button color="primary" variant="flat" className="w-full">
+          <Button
+            color="primary"
+            variant="flat"
+            className="w-full"
+            onPress={applyFilters}
+          >
             Apply
           </Button>
         </div>
         <div className="col-span-2">
-          <Button color="danger" variant="flat" className="w-full" onPress={resetFilters}>
+          <Button
+            color="danger"
+            variant="flat"
+            className="w-full"
+            onPress={resetFilters}
+          >
             Reset
           </Button>
         </div>

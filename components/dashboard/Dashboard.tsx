@@ -6,6 +6,12 @@ import Filters from "@/components/dashboard/Filters";
 import Charts from "@/components/dashboard/Charts";
 import Scheduler from "@/components/dashboard/Scheduler";
 import { useDashboardStore } from "@/store/dashboardStore";
+import { CalendarDate } from "@internationalized/date";
+
+type RangeValue<T> = {
+  start: T;
+  end: T;
+};
 
 interface School {
   id: string;
@@ -14,44 +20,59 @@ interface School {
 
 interface Session {
   id: string;
-  name: string;
+  sessionName: string;
 }
-
 
 export const Dashboard = () => {
   const getDashboard = useDashboardStore((state) => state.getData);
+  const getFilterDashboard = useDashboardStore(
+    (state) => state.getFilteredData
+  );
   const [categories, setCategories] = useState([]);
   const [schools, setSchools] = useState<School[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [years, setYears] = useState([]);
 
   // Filters
+  const [dateRange, setDateRange] =
+    React.useState<RangeValue<CalendarDate> | null>();
   const [session, setSession] = useState(sessions[0]?.id || "");
   const [year, setYear] = useState(String(years[0] || ""));
   const [school, setSchool] = useState<string>(schools[0]?.id || "");
 
   const applyFilters = async () => {
-    // call axios to get filtered data
-    return;
+    const filters: any = {
+      session,
+      year,
+      school,
+    };
+    if (dateRange) {
+      filters.startDate = dateRange.start.toString(); // ISO format
+      filters.endDate = dateRange.end.toString();
+    }
+
+    const data = await getFilterDashboard(filters);
+    if (data) {
+      setCategories(data.categories);
+    }
   };
 
   const resetFilters = () => {
+    setDateRange(null);
     setSchool("");
     setSession("");
     setYear("");
-    console.log("Filters reset successfully");
   };
 
   const handleSubmit = async () => {
-    const response = await getDashboard();
-    if (response.status !== 200) {
-      throw new Error("Failed to fetch dashboard data");
+    const data = await getDashboard();
+    if (data) {
+      setCategories(data.categories);
+      setSchools(data.schools);
+      setSessions(data.sessions);
+      setYears(data.years);
+      console.log("Sessions = ", data.sessions);
     }
-    const data = response.data;
-    setCategories(data.categories);
-    setSchools(data.schools);
-    setSessions(data.sessions);
-    setYears(data.years);
   };
 
   useEffect(() => {
@@ -71,6 +92,9 @@ export const Dashboard = () => {
         year={year}
         setYear={setYear}
         resetFilters={resetFilters}
+        applyFilters={applyFilters}
+        dateRange={dateRange}
+        setDateRange={setDateRange}
       />
       <SummaryCards categories={categories} />
       <Charts categories={categories} />
